@@ -1,4 +1,4 @@
-# Password Generator Web App
+# Password Manager Web App
 
 ## Overview
 
