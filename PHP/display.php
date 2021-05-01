@@ -107,19 +107,19 @@
 
                   <!-- Name -->
                   <label class="add">Name: <p class="required">*</p></label>
-                  <input type="text" name="changed_name" autocomplete="save-password-name" value="<?php echo $row["name"] ?>" autofocus required><br>
+                  <input type="text" name="changed_name" maxlength="20" autocomplete="save-password-name" value="<?php echo $row["name"] ?>" autofocus required><br>
 
                   <!-- Username -->
                   <label class="add">Username/email:</label>
-                  <input type="text" name="changed_username" value="<?php echo $row["username"] ?>" autocomplete="save-password-username"><br>
+                  <input type="text" name="changed_username" maxlength="50" value="<?php echo $row["username"] ?>" autocomplete="save-password-username"><br>
 
                   <!-- URL -->
                   <label class="add">URL:</label>
-                  <input type="url" name="changed_url" value="<?php echo $row["url"] ?>" pattern="https?://.+" autocomplete="save-password-url" oninvalid="this.setCustomValidity('Please enter a valid URL (must start with https://)')"><br>
+                  <input type="url" name="changed_url" maxlength="255" value="<?php echo $row["url"] ?>" pattern="https?://.+" autocomplete="save-password-url" oninvalid="this.setCustomValidity('Please enter a valid URL (must start with https://)')"><br>
 
                   <!-- Password -->
                   <label class="add">Password: <p class="required">*</p></label>
-                  <input type="password" name="changed_password" autocomplete="off" value="<?php echo $decrypted_pass ?>" required><br>
+                  <input type="password" name="changed_password" maxlength="100" autocomplete="off" value="<?php echo $decrypted_pass ?>" required><br>
 
                   <input style="display:none;" type="text" name="id" autocomplete="off" value="<?php echo $row["passID"] ?>" required><br>
 
@@ -222,17 +222,10 @@
 
         <?php
 
-        // If the form is submitted, save the password
+        // If the form is submitted and all of the required fields have been filled in, save the password
         if(isset($_POST["save"])){
 
-          $new_url = $_POST["changed_url"];
-
-          if (filter_var($new_url, FILTER_VALIDATE_URL) && $new_url) {
-            // Not a valid URL message
-            $message = "Not a valid URL!";
-            include "PHP/popup_message.php";;
-
-          } else {
+          if (!empty($_POST['changed_name'])&& !empty($_POST['changed_password'])) {
 
             // SQL to UPDATE into database
             $sql = $mysqli->prepare("UPDATE passwords SET name = ?, username = ?, url = ?, password = ? WHERE passID = ?");
@@ -250,9 +243,17 @@
 
             $sql->execute();
 
+			      mysqli_close();
+
             // Refresh the page
             echo "<script type='text/javascript'>window.top.location='saved_passwords.php';</script>";
+            
+          } else {
+            // Fields not filled in
+            $message = "Please fill in all required fields!";
+            include "PHP/popup_message.php";
           }
+
         }
 
         ?>

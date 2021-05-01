@@ -13,6 +13,8 @@
 
   $sql->execute();
 
+  mysqli_close();
+
   // Redirect back to the saved passwords page
   header("Location: ../saved_passwords.php")
 ?>
