@@ -37,11 +37,11 @@
       <form action="" method="post">
         <!-- Old master password -->
         <label class="details">Old master password:</label>
-        <input type="password" name="old_pass" autofocus required><br>
+        <input type="password" name="old_pass" maxlength="30" autofocus required><br>
 
         <!-- New master password -->
         <label class="details">New master password:</label>
-        <input type="password" name="new_pass" required><br>
+        <input type="password" name="new_pass" maxlength="30" required><br>
 
         <!-- Save button -->
         <input type="submit" name="save" value="Save">
@@ -93,51 +93,62 @@
         // PHP code to change the master password
         require "PHP/connect_db.php"; // Connects to database
 
+        // If changes are saved and the old password and new password fields aren't empty
         if (isset($_POST["save"])) {
 
-          // Lookup username in database
-          $sql = $mysqli->prepare("SELECT masterPass FROM users WHERE username = ?");
-          $sql->bind_param("s", $username);
+          if (!empty($_POST['old_pass']) && !empty($_POST['new_pass'])) {
 
-          $username = $_SESSION['username'];
+            // Lookup username in database
+            $sql = $mysqli->prepare("SELECT masterPass FROM users WHERE username = ?");
+            $sql->bind_param("s", $username);
 
-          // Execute
-          $sql->execute();
-          $result = $sql->get_result();
-          $row = $result->fetch_assoc();
-
-          // Get old and new master passwords from form and hash them
-          $old_pass_hash = hash("sha256",$_POST['old_pass']);
-          $new_pass_hash = hash("sha256",$_POST['new_pass']);
-
-          // Get actual password hash
-          $password_hash = $row["masterPass"];
-
-          // Compare the hashes to see if the password is correct
-          if ($old_pass_hash == $password_hash) {
-
-            // SQL statement for updating password
-            $sql = $mysqli->prepare("UPDATE users SET masterPass = ? WHERE username = ?");
-            $sql->bind_param("ss", $new_pass_hash, $username);
-
-            // Get parameters
-            $new_pass_hash = hash("sha256",$_POST['new_pass']);
             $username = $_SESSION['username'];
 
             // Execute
             $sql->execute();
+            $result = $sql->get_result();
+            $row = $result->fetch_assoc();
 
-            // Password changed message
-            $message = "Password changed!";
-            include "PHP/popup_message.php";
+            // Get old and new master passwords from form and hash them
+            $old_pass_hash = hash("sha256",$_POST['old_pass']);
+            $new_pass_hash = hash("sha256",$_POST['new_pass']);
+
+            // Get actual password hash
+            $password_hash = $row["masterPass"];
+
+            // Compare the hashes to see if the password is correct
+            if ($old_pass_hash == $password_hash) {
+
+              // SQL statement for updating password
+              $sql = $mysqli->prepare("UPDATE users SET masterPass = ? WHERE username = ?");
+              $sql->bind_param("ss", $new_pass_hash, $username);
+
+              // Get parameters
+              $new_pass_hash = hash("sha256",$_POST['new_pass']);
+              $username = $_SESSION['username'];
+
+              // Execute
+              $sql->execute();
+
+              // Password changed message
+              $message = "Password changed!";
+              include "PHP/popup_message.php";
+
+            } else {
+              // Incorrect master password message
+              $message = "Incorrect master password!";
+              include "PHP/popup_message.php";
+            }
 
           } else {
-            // Incorrect master password message
-            $message = "Incorrect master password!";
-            include "PHP/popup_message.php";
+              // Fields not filled in
+              $message = "Please fill in all required fields!";
+              include "PHP/popup_message.php";
           }
 
         }
+
+        mysqli_close();
 
       ?>
     </div>

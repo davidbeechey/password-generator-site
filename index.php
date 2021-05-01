@@ -24,10 +24,10 @@
       <!-- Master password form -->
       <form style="clear: both;" action = "" method="post" id="master_login">
         <!-- Username -->
-        <input id="username" type="text" name="username" placeholder="Enter username" autofocus>
+        <input id="username" type="text" name="username" placeholder="Enter username" maxlength="15" autofocus required>
 
         <!-- Master password -->
-        <input id="password" type="password" name="master_password" placeholder="Enter master password" autofocus>
+        <input id="password" type="password" name="master_password" placeholder="Enter master password" maxlength="30" required>
 
         <!-- Submit button -->
         <input type="submit" name="login" value="Log in">
@@ -44,64 +44,73 @@
 
       error_reporting(0); // Turns off error reporting
 
-      // If the login button is pressed and the password field isn't empty, verify password
-      if (isset($_POST['login']) && !empty($_POST['master_password'])) {
+      // If the login button is pressed and the username and password field isn't empty, verify password
+      if (isset($_POST['login'])) {
 
-        // Lookup username in database
-        $sql = $mysqli->prepare("SELECT masterPass,userID,username FROM Users WHERE username = ?");
-        $sql->bind_param("s", $username);
+        if (!empty($_POST['username']) && !empty($_POST['master_password'])) {
 
-        // Get username and password from form
-        $username = $_POST["username"];
+          // Lookup username in database
+          $sql = $mysqli->prepare("SELECT masterPass,userID,username FROM Users WHERE username = ?");
+          $sql->bind_param("s", $username);
 
-        // Execute
-        $sql->execute();
+          // Get username and password from form
+          $username = $_POST["username"];
 
-        $result = $sql->get_result();
-        $row = $result->fetch_assoc();
+          // Execute
+          $sql->execute();
 
-        // Check if that username is in the database
-        if ($row) {
+          $result = $sql->get_result();
+          $row = $result->fetch_assoc();
 
-          // Get password attempt
-          $password = $_POST["master_password"];
+          // Check if that username is in the database
+          if ($row) {
 
-          // Hash password from username
-          $attempt_hash = hash("sha256",$password);
+            // Get password attempt
+            $password = $_POST["master_password"];
 
-          // Get password hash from database
-          $password_hash = $row["masterPass"];
+            // Hash password from username
+            $attempt_hash = hash("sha256",$password);
 
-          // Compare hashes
-          if ($attempt_hash == $password_hash) {
+            // Get password hash from database
+            $password_hash = $row["masterPass"];
 
-            // The hashes match, so the password is correct
-            $_SESSION['valid'] = true; // Sets the $_SESSION['valid'] variable (logs user in)
-            $_SESSION['timeout'] = time();
-            $_SESSION['userID'] = $row["userID"];
-            $_SESSION['username'] = $row["username"];
+            // Compare hashes
+            if ($attempt_hash == $password_hash) {
 
-            header('Refresh: 0;'); // Refreshes the page
+              // The hashes match, so the password is correct
+              $_SESSION['valid'] = true; // Sets the $_SESSION['valid'] variable (logs user in)
+              $_SESSION['userID'] = $row["userID"];
+              $_SESSION['username'] = $row["username"];
+
+              header('Refresh: 0;'); // Refreshes the page
+
+            } else {
+              // Password is incorrect
+              // Display password incorrect message
+
+              $message = "Password incorrect!";
+              include "PHP/popup_message.php";
+
+            }
 
           } else {
-            // Password is incorrect
-            // Display password incorrect message
+            // Username is not found
+            // Display username not found message
 
-            $message = "Password incorrect!";
+            $message = "Username not found!";
             include "PHP/popup_message.php";
 
           }
 
         } else {
-          // Username is not found
-          // Display username not found message
-
-          $message = "Username not found!";
-          include "PHP/popup_message.php";
-
+            // Fields not filled in
+            $message = "Please fill in all required fields!";
+            include "PHP/popup_message.php";
         }
 
       }
+
+      mysqli_close();
 
       ?>
     </div>

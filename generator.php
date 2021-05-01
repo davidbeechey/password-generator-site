@@ -3,7 +3,7 @@
 <html>
 
   <head>
-    <title>Account Details</title>
+    <title>Password Generator</title>
     <link rel="stylesheet" href="CSS/styles.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="js/theme.js" type="text/javascript"></script>
@@ -98,19 +98,19 @@
 
         <!-- Name -->
         <label class="add">Name: <p class="required">*</p></label>
-        <input type="text" name="name" autocomplete="save-password-name" required autofocus><br>
+        <input type="text" name="name" autocomplete="save-password-name" maxlength="20" required autofocus><br>
 
         <!-- Username -->
         <label class="add">Username/email:</label>
-        <input type="text" name="username" autocomplete="save-password-username"><br>
+        <input type="text" name="username" autocomplete="save-password-username" maxlength="50"><br>
 
         <!-- URL -->
         <label class="add">URL:</label>
-        <input type="url" name="url" pattern="https?://.+" autocomplete="save-password-url" oninvalid="this.setCustomValidity('Please enter a valid URL (must start with https://)')"><br>
+        <input type="url" name="url" pattern="https?://.+" maxlength="255" autocomplete="save-password-url" oninvalid="this.setCustomValidity('Please enter a valid URL (must start with https://)')"><br>
 
         <!-- Password -->
         <label class="add">Password: <p class="required">*</p></label>
-        <input id="password_field" type="text" name="password" required><br>
+        <input id="password_field" type="text" name="password" maxlength="100" required><br>
 
         <!-- Submit -->
         <input type="submit" name="submit" value="Add">

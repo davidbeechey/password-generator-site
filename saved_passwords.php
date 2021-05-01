@@ -29,7 +29,7 @@
 
       <!-- Search box -->
       <form action="" method="post" id="search_form">
-        <input type="text" name="keyword" id="search" placeholder="Search passwords" required>
+        <input type="text" name="keyword" id="search" placeholder="Search passwords" maxlength="20" required>
         <input type="submit" name="submit_search" value="Search">
       </form>
 
@@ -39,30 +39,38 @@
       // If the submit button is pressed and the search box isn't empty, search for keyword
       if(isset($_POST['submit_search'])) {
 
-        // Search database
-        $sql = $mysqli->prepare("SELECT passID, name, username, url, password FROM passwords WHERE name LIKE ? AND userID = ?");
-        $sql->bind_param("si", $form_search, $userID);
+        if (!empty($_POST['keyword'])) {
 
-        // Gets keyword from form and userID
-        $form_search = '%' . $_POST["keyword"] . '%';
-        $userID = $_SESSION["userID"];
+          // Search database
+          $sql = $mysqli->prepare("SELECT passID, name, username, url, password FROM passwords WHERE name LIKE ? AND userID = ?");
+          $sql->bind_param("si", $form_search, $userID);
 
-        // Execute
-        $sql->execute();
-        $result = $sql->get_result();
+          // Gets keyword from form and userID
+          $form_search = '%' . $_POST["keyword"] . '%';
+          $userID = $_SESSION["userID"];
 
-        // Displays title with the current search
-        echo '<h2>Search results for "' . $_POST["keyword"] . '"</h2>'; // Creates title
+          // Execute
+          $sql->execute();
+          $result = $sql->get_result();
 
-        // Displays the number of results found
-        if ($result->num_rows == 1) {
-          echo '<p>1 result found</p><br>';
+          // Displays title with the current search
+          echo '<h2>Search results for "' . $_POST["keyword"] . '"</h2>'; // Creates title
+
+          // Displays the number of results found
+          if ($result->num_rows == 1) {
+            echo '<p>1 result found</p><br>';
+          } else {
+            echo '<p>' . $result->num_rows . ' results found</p><br>';
+          }
+
+          $display_search = true;
+          include "PHP/display.php"; // Display result of SQL query
+
         } else {
-          echo '<p>' . $result->num_rows . ' results found</p><br>';
+          // Fields not filled in
+          $message = "Please fill in all required fields!";
+          include "PHP/popup_message.php";
         }
-
-        $display_search = true;
-        include "PHP/display.php"; // Display result of SQL query
 
       }
 
@@ -88,6 +96,8 @@
 
       $display_search = false;
       include "PHP/display.php"; // Display passwords
+
+      mysqli_close();
 
       ?>
     </div>

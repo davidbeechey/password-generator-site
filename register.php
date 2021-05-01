@@ -17,13 +17,13 @@
       <!-- Master password form -->
       <form style="clear: both;" action = "" method="post" id="master_login">
         <!-- Username -->
-        <input id="username" type="text" name="username" placeholder="Enter a username" autofocus required>
+        <input id="username" type="text" name="username" placeholder="Enter a username" maxlength="15" autofocus required>
 
         <!-- Master password -->
-        <input id="password" type="password" name="master_password" placeholder="Enter a master password" required>
+        <input id="password" type="password" name="master_password" placeholder="Enter a master password" maxlength="30" required>
 
         <!-- Confirm master password -->
-        <input id="password" type="password" name="confirm_master_password" placeholder="Confirm master password" required>
+        <input id="password" type="password" name="confirm_master_password" placeholder="Confirm master password" maxlength="30" required>
 
         <!-- Submit button -->
         <input type="submit" name="register" value="Register">
@@ -42,59 +42,69 @@
       // If the login button is pressed and the password field isn't empty, verify password
       if (isset($_POST['register'])) {
 
-        // Lookup username in database to check for duplicates
-        $sql = $mysqli->prepare("SELECT username FROM users WHERE username = ?");
-        $sql->bind_param("s", $new_username);
+        if (!empty($_POST['username']) && !empty($_POST['master_password']) && !empty($_POST['confirm_master_password'])) {
 
-        // Get username from form
-        $new_username = $_POST["username"];
+          // Lookup username in database to check for duplicates
+          $sql = $mysqli->prepare("SELECT username FROM users WHERE username = ?");
+          $sql->bind_param("s", $new_username);
 
-        // Execute
-        $sql->execute();
-        $result = $sql->get_result();
-        $row = $result->fetch_assoc();
+          // Get username from form
+          $new_username = $_POST["username"];
 
-        if (!$row) {
+          // Execute
+          $sql->execute();
+          $result = $sql->get_result();
+          $row = $result->fetch_assoc();
 
-          $new_password = $_POST["master_password"];
-          $confirm_new_password = $_POST["confirm_master_password"];
+          if (!$row) {
 
-          if ($new_password == $confirm_new_password) {
+            $new_password = $_POST["master_password"];
+            $confirm_new_password = $_POST["confirm_master_password"];
 
-            // SQL to insert into database
-            $sql = $mysqli->prepare("INSERT INTO Users (username,masterPass) VALUES(?, ?)");
-            $sql->bind_param("ss", $new_username, $hashed_pass);
+            if ($new_password == $confirm_new_password) {
 
-            // Get parameters
-            $new_username = $_POST["username"];
-            $hashed_pass = hash("sha256",$new_password);
+              // SQL to insert into database
+              $sql = $mysqli->prepare("INSERT INTO Users (username,masterPass) VALUES(?, ?)");
+              $sql->bind_param("ss", $new_username, $hashed_pass);
 
-            // Execute
-            $sql->execute();
+              // Get parameters
+              $new_username = $_POST["username"];
+              $hashed_pass = hash("sha256",$new_password);
 
-            // Create popup message: "Password added!"
-            $message = "Account created!";
-            include "PHP/popup_message.php";
+              // Execute
+              $sql->execute();
 
-            header("Location: index.php");
+              // Create popup message: "Password added!"
+              $message = "Account created!";
+              include "PHP/popup_message.php";
+
+              header("Location: index.php");
+
+            } else {
+
+              // Create popup message: "Password do not match!"
+              $message = "Passwords do not match!";
+              include "PHP/popup_message.php";
+
+            }
 
           } else {
 
-            // Create popup message: "Password do not match!"
-            $message = "Passwords do not match!";
+            // Create popup message: "That username already exists!"
+            $message = "That username already exists!";
             include "PHP/popup_message.php";
 
           }
 
         } else {
-
-          // Create popup message: "That username already exists!"
-          $message = "That username already exists!";
+          // Fields not filled in
+          $message = "Please fill in all required fields!";
           include "PHP/popup_message.php";
-
         }
 
       }
+
+      mysqli_close();
 
       ?>
 

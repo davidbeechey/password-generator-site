@@ -35,19 +35,19 @@
       <form action="" method="post">
         <!-- Name -->
         <label class="add">Name: <p class="required">*</p></label>
-        <input type="text" name="name" autocomplete="save-password-name" autofocus required><br>
+        <input type="text" name="name" autocomplete="off" maxlength="20" autofocus required><br>
 
         <!-- Username -->
         <label class="add">Username/email:</label>
-        <input type="text" name="username" autocomplete="save-password-username"><br>
+        <input type="text" name="username" autocomplete="off" maxlength="50"><br>
 
         <!-- URL -->
         <label class="add">URL:</label>
-        <input type="url" name="url" pattern="https?://.+" autocomplete="save-password-url" oninvalid="this.setCustomValidity('Please enter a valid URL (must start with https://)')"><br>
+        <input type="url" name="url" pattern="https?://.+" maxlength="255" autocomplete="off" oninvalid="this.setCustomValidity('Please enter a valid URL (must start with https://)')"><br>
 
         <!-- Password -->
         <label class="add">Password: <p class="required">*</p></label>
-        <input type="password" name="password" autocomplete="off" required><br>
+        <input type="password" name="password" autocomplete="off" maxlength="100" required><br>
 
         <!-- Submit button -->
         <input type="submit" name="submit" value="Add">
