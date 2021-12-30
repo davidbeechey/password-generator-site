@@ -1,5 +1,7 @@
 # Password Manager Web App
 
+*** This was my AH Computing Project, there are issues with this project (other than it being PHP!) like lack of password salting etc. ***
+
 ## Overview
 
 Web app to create, save and manage passwords.
